@@ -877,60 +877,97 @@ header::before {
     </div>
   </div>
 </footer>
-
 <script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) entry.target.classList.add("visible");
-    });
-  }, { threshold: 0.12 });
-
-  document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-
-  // Infinite Carousel Logic
 const track = document.getElementById('carouselTrack');
-const items = document.querySelectorAll('.carousel-item');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 
-let currentIndex = 0;
-const itemWidth = items[0].offsetWidth + 32; // including padding
-const totalItems = items.length / 2; // since duplicated
+let position = 0;
+let itemWidth = 0;
+let autoScroll;
 
-function moveTo(index) {
-  track.style.transform = `translateX(-${index * itemWidth}px)`;
+// Clone items for true infinite loop
+function cloneItems() {
+  const items = [...document.querySelectorAll('.carousel-item')];
+  items.forEach(item => {
+    const clone = item.cloneNode(true);
+    clone.classList.add('clone');
+    track.appendChild(clone);
+  });
 }
 
+// Calculate width properly
+function calculateWidth() {
+  const firstItem = document.querySelector('.carousel-item');
+  itemWidth = firstItem.getBoundingClientRect().width;
+}
+
+// Move carousel
+function moveCarousel() {
+  track.style.transition = "transform 1s ease-in-out";
+  track.style.transform = `translateX(-${position}px)`;
+}
+
+// Auto loop reset
+function loopCheck() {
+  const totalWidth = track.scrollWidth / 2;
+
+  if (position >= totalWidth) {
+    track.style.transition = "none";
+    position = 0;
+    track.style.transform = `translateX(0px)`;
+  }
+
+  if (position < 0) {
+    track.style.transition = "none";
+    position = totalWidth - itemWidth;
+    track.style.transform = `translateX(-${position}px)`;
+  }
+}
+
+// Auto scroll
+function startAutoScroll() {
+  autoScroll = setInterval(() => {
+    position += itemWidth;
+    moveCarousel();
+    setTimeout(loopCheck, 1100);
+  }, 4500);
+}
+
+// Buttons
 nextBtn.addEventListener('click', () => {
-  currentIndex = (currentIndex + 1) % totalItems;
-  moveTo(currentIndex);
+  clearInterval(autoScroll);
+  position += itemWidth;
+  moveCarousel();
+  setTimeout(loopCheck, 1100);
+  startAutoScroll();
 });
 
 prevBtn.addEventListener('click', () => {
-  currentIndex = (currentIndex - 1 + totalItems) % totalItems;
-  moveTo(currentIndex);
+  clearInterval(autoScroll);
+  position -= itemWidth;
+  moveCarousel();
+  setTimeout(loopCheck, 1100);
+  startAutoScroll();
 });
-
-// Auto-scroll (smooth continuous motion)
-let autoScroll = setInterval(() => {
-  currentIndex = (currentIndex + 1) % totalItems;
-  moveTo(currentIndex);
-}, 4500); // every 4.5 seconds
 
 // Pause on hover
 track.addEventListener('mouseenter', () => clearInterval(autoScroll));
-track.addEventListener('mouseleave', () => {
-  autoScroll = setInterval(() => {
-    currentIndex = (currentIndex + 1) % totalItems;
-    moveTo(currentIndex);
-  }, 4500);
+track.addEventListener('mouseleave', startAutoScroll);
+
+// Init after load
+window.addEventListener('load', () => {
+  cloneItems();
+  calculateWidth();
+  startAutoScroll();
 });
 
-// Initial position
-moveTo(0);
+// Recalculate on resize
+window.addEventListener('resize', () => {
+  calculateWidth();
+});
 </script>
 
 </body>
 </html>
+
