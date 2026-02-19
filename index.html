@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Running a Cafe – The Business of Beans</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --brand-gold: #d4af37;
+      --glow-gold: rgba(255, 215, 0, 0.6);
+      --brand-red: #e1251b;
+      --deep-brown: #2c1a0f;
+      --cream: #fff8e7;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.8;
+      color: #3f2a12;
+      background: #f9f5f0;
+    }
+
+    .cafe-bg {
+      position: fixed;
+      inset: 0;
+      background: url("https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80") center/cover no-repeat fixed;
+      z-index: -2;
+      filter: brightness(0.85) contrast(1.1);
+    }
+
+    .cafe-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(101,67,33,0.75));
+      z-index: -1;
+    }
+
+    header {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--cream);
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(212,175,55,0.12), transparent 60%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      padding: 2rem;
+    }
+
+    .header-title {
+      font-size: 5.5rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      text-shadow: 0 10px 40px rgba(0,0,0,0.7);
+      background: linear-gradient(135deg, #fff8e7, #ffd700, #fff8e7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-subtitle {
+      font-size: 2.25rem;
+      font-weight: 400;
+      margin-top: 1.5rem;
+      color: #ffd54f;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .premium-tag {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #d4af37, #b8972e);
+      color: #1a0f00;
+      font-weight: 700;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.4);
+      box-shadow: 0 10px 30px rgba(212,175,55,0.5), inset 0 2px 10px rgba(255,255,255,0.3);
+      backdrop-filter: blur(8px);
+      transition: all 0.4s ease;
+    }
+
+    .premium-tag:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 20px 50px rgba(212,175,55,0.7);
+    }
+
+    .content-card {
+      position: relative;
+      border-radius: 2.5rem;
+      background: rgba(255,251,240,0.96);
+      backdrop-filter: blur(22px);
+      padding: 3.5rem;
+      box-shadow: 0 40px 120px rgba(0,0,0,0.28);
+      border: 1px solid rgba(212,175,55,0.3);
+      overflow: hidden;
+    }
+
+    .content-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 2.5rem;
+      padding: 4px;
+      background: linear-gradient(135deg, #d4af37, #fbbf24, #d4af37, #c9a100);
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.75;
+      z-index: -1;
+    }
+
+    .glass {
+      background: rgba(255,251,240,0.82);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(212,175,55,0.35);
+      box-shadow: 0 25px 70px rgba(63,42,12,0.22);
+      border-radius: 2rem;
+    }
+
+    .node {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fbbf24, #d4af37);
+      color: #2c1a0f;
+      font-weight: 800;
+      box-shadow: 0 10px 30px rgba(212,175,55,0.5), inset 0 3px 10px rgba(255,255,255,0.4);
+      transition: all 0.4s ease;
+    }
+
+    .node:hover {
+      transform: scale(1.18) translateY(-6px);
+      box-shadow: 0 20px 50px rgba(212,175,55,0.8);
+    }
+
+    .node.final {
+      background: linear-gradient(135deg, #cfafad, #dea0a0);
+      color: white;
+    }
+
+    footer {
+      background: linear-gradient(135deg, #2c1a0f, #3f2a12);
+      color: #fff8e7;
+      border-top: 5px solid var(--brand-gold);
+    }
+    .carousel-track {
+  display: flex;
+  will-change: transform;
+}
+
+.carousel-item {
+  flex: 0 0 auto;
+}
+
+.content-card {
+  transition: all 0.5s ease;
+}
+
+.content-card:hover {
+  transform: translateY(-12px);
+}
+
+.content-card {
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  background: rgba(255, 251, 240, 0.97);
+  backdrop-filter: blur(18px);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.content-card:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 40px 100px rgba(212, 175, 55, 0.35) !important;
+  border-color: rgba(212, 175, 55, 0.6);
+}
+
+.content-card img {
+  filter: drop-shadow(0 8px 16px rgba(212, 175, 55, 0.3));
+}
+.text-amber-700 {
+    --tw-text-opacity: 1;
+    color: rgb(255 210 175);
+}
+.text-amber-900 {
+    --tw-text-opacity: 1;
+    color: rgb(255 168 118);
+}
+.content-card {
+  border-radius: 2rem;
+  background: rgba(255, 251, 240, 0.97);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 20px 60px rgba(63, 42, 12, 0.15);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.content-card:hover {
+  transform: translateY(-14px) scale(1.03);
+  box-shadow: 0 40px 100px rgba(212, 175, 55, 0.35);
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+/* Optional gradient overlay on image hover */
+.content-card img {
+  position: relative;
+}
+
+.content-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(212,175,55,0.12));
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.content-card:hover::after {
+  opacity: 1;
+}
+
+.content-card {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  border-radius: 1.75rem; /* matches your xl radius */
+}
+
+.content-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 20px 40px rgba(255, 180, 162, 0.3); /* coral shadow from your config */
+}
+
+.card-heading {
+  font-size: 1.875rem; /* 30px */
+  font-weight: bold;
+  color: #FFB4A2; /* coral */
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Optional subtle image overlay on hover */
+.content-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(255,180,162,0.15));
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.content-card:hover::after {
+  opacity: 1;
+}
+.clay-card {
+  background: linear-gradient(145deg, #f0e9e0, #e0d4c0);
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: 
+    12px 12px 24px rgba(163, 143, 119, 0.4),
+    -12px -12px 24px rgba(255, 255, 255, 0.7);
+  transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.clay-card:hover {
+  transform: translateY(-14px) scale(1.03);
+  box-shadow: 
+    20px 20px 40px rgba(163, 143, 119, 0.5),
+    -20px -20px 40px rgba(255, 255, 255, 0.9);
+}
+
+.image-wrapper {
+  height: 220px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.clay-card:hover .card-image {
+  transform: scale(1.12);
+}
+
+.content {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: linear-gradient(to bottom, transparent, rgba(255,251,240,0.4));
+}
+
+.card-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #c9a100; /* deep gold / caramel */
+  margin-bottom: 0.75rem;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card-desc {
+  font-size: 1.1rem;
+  color: #5c4033;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+/* Optional inner highlight on hover */
+.clay-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 2rem;
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.clay-card:hover::before {
+  opacity: 0;
+}
+
+.clay-card {
+  background: linear-gradient(145deg, #f0e9e0, #e0d4c0);
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: 
+    12px 12px 24px rgba(163, 143, 119, 0.4),
+    -12px -12px 24px rgba(255, 255, 255, 0.7);
+  transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.clay-card:hover {
+  transform: translateY(-14px) scale(1.03);
+  box-shadow: 
+    20px 20px 40px rgba(163, 143, 119, 0.5),
+    -20px -20px 40px rgba(255, 255, 255, 0.9);
+}
+
+.image-wrapper {
+  height: 220px;           /* taller images for better 2×2 balance */
+  overflow: hidden;
+  position: relative;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.clay-card:hover .card-image {
+  transform: scale(1.12);
+}
+
+.content {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: linear-gradient(to bottom, transparent, rgba(255,251,240,0.4));
+}
+
+.card-title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #c9a100;           /* rich gold/caramel */
+  margin-bottom: 0.75rem;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card-desc {
+  font-size: 1.125rem;
+  color: #5c4033;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+/* Subtle inner glow/highlight on hover */
+.clay-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 2rem;
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.clay-card:hover::before {
+  opacity: 1;
+}
+header {
+  background: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80') center/cover no-repeat fixed;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(101,67,33,0.75));
+  z-index: 1;
+}
+
+.header-title {
+  text-shadow: 0 8px 32px rgba(0,0,0,0.7);
+  background: linear-gradient(135deg, #fff8e7, #ffd700, #fff8e7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.premium-tag {
+  box-shadow: 0 10px 30px rgba(212,175,55,0.4), inset 0 2px 10px rgba(255,255,255,0.25);
+  transition: all 0.4s ease;
+}
+
+.premium-tag:hover {
+  transform: scale(1.05) translateY(-4px);
+  box-shadow: 0 20px 50px rgba(212,175,55,0.6);
+}
+.header-title {
+  text-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  background: linear-gradient(135deg, #fff8e7, #ffd700, #fff8e7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 2.0; /* ensures descenders have room */
+}
+
+@media (max-width: 640px) {
+  .header-title {
+    font-size: 3.5rem; /* smaller on mobile so g doesn't get cut */
+    line-height: 2.0;
+  }
+}
+  </style>
+</head>
+<body>
+
+<div class="cafe-bg"></div>
+<div class="cafe-overlay"></div>
+
+<header class="relative min-h-[90vh] md:min-h-screen flex items-center justify-center text-center text-cream overflow-visible px-6 py-32 md:py-40">
+  <!-- Background + overlay -->
+  <div class="absolute inset-0 z-0">
+    <img 
+      src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80" 
+      alt="Cozy cafe background" 
+      class="w-full h-full object-cover"
+    >
+    <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black/75"></div>
+  </div>
+
+  <!-- Main content wrapper with extra breathing room -->
+  <div class="relative z-10 max-w-5xl mx-auto w-full pt-8 md:pt-12">
+    <!-- SkilliiZee Logo -->
+    <div class="mb-12 md:mb-16">
+      <img 
+        src="./images/skillizee.png" 
+        alt="SkilliiZee" 
+        class="mx-auto w-48 md:w-64 lg:w-72 h-auto drop-shadow-2xl"
+        loading="lazy"
+      >
+    </div>
+
+    <!-- Intro text -->
+    <div class="mb-16 md:mb-24 space-y-6 md:space-y-10">
+      <h2 class="text-4xl md:text-5xl lg:text-6xl font-light tracking-wide text-amber-200 leading-tight drop-shadow-xl">
+        Experience Beyond Classroom
+      </h2>
+
+      <p class="text-xl md:text-2xl lg:text-3xl font-medium text-amber-100/95 max-w-4xl mx-auto leading-relaxed drop-shadow-lg">
+        Because Tomorrow Needs More <span class="text-amber-300 font-bold">SKILLS</span> Than Just <span class="text-amber-300 font-bold">SCORES</span>.
+      </p>
+
+      <p class="text-lg md:text-xl lg:text-2xl text-amber-50/90 max-w-4xl mx-auto leading-relaxed drop-shadow-md">
+        Transform your learning journey with hands-on projects, industry mentors, and co-branded internships from 
+        <span class="font-semibold text-amber-300">Netflix</span>, 
+        <span class="font-semibold text-amber-300">Gudgum</span>, 
+        <span class="font-semibold text-amber-300">Starbucks</span> and more.
+      </p>
+    </div>
+
+    <!-- Course Title – with explicit safe line-height and padding -->
+    <div class="py-6 md:py-10">
+      <h1 class="header-title text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-amber-100 leading-[1.05] mb-4 md:mb-6">
+        Running a Cafe
+      </h1>
+    </div>
+
+    <div class="header-subtitle text-3xl md:text-4xl lg:text-5xl font-medium text-amber-300 mb-8 md:mb-10">
+      The Business of Beans
+    </div>
+
+    <div class="premium-tag inline-block px-8 py-5 md:px-12 md:py-6 text-xl md:text-2xl lg:text-3xl font-semibold text-amber-900 bg-gradient-to-r from-amber-300 via-amber-200 to-amber-300 rounded-full shadow-2xl border-2 border-amber-400/50 backdrop-blur-md">
+      Premium Entrepreneurship Education • Real-World Café Mastery
+    </div>
+  </div>
+
+  <!-- Decorative underline -->
+  <div class="absolute bottom-12 md:bottom-16 left-1/2 -translate-x-1/2 w-48 md:w-72 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent rounded-full opacity-70"></div>
+</header>
+
+<main class="relative z-10 pt-16 pb-32">
+  <div class="max-w-7xl mx-auto px-6 space-y-32">
+
+  <!-- Premium Carousel Learning Journey -->
+<section class="reveal py-24 bg-gradient-to-b from-amber-50/30 to-transparent">
+  <div class="text-center mb-16 px-6">
+    <h2 class="text-5xl md:text-6xl font-light text-amber-500 tracking-wide">Your Exclusive Learning Journey</h2>
+    <p class="mt-6 text-xl md:text-2xl text-amber-100 max-w-4xl mx-auto opacity-90">
+      Glide through 8 masterful stages — from visionary spark to confident investor pitch.
+    </p>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto overflow-hidden px-4 md:px-8">
+    <!-- Carousel Container -->
+    <div class="carousel-track flex transition-transform duration-1000 ease-in-out" id="carouselTrack">
+      <!-- Step 1 -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">1</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Concept & Vision</h3>
+          <p class="text-amber-700 text-lg">Ignite your unique café idea and entrepreneurial mindset.</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">2</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Financial Mastery</h3>
+          <p class="text-amber-700 text-lg">Master costs, revenue modeling & break-even precision.</p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">3</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Menu Engineering</h3>
+          <p class="text-amber-700 text-lg">Craft signature items with smart pricing & appeal.</p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">4</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Market Intelligence</h3>
+          <p class="text-amber-700 text-lg">Decode trends, competition & customer desires in India.</p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">5</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Premium Setup</h3>
+          <p class="text-amber-700 text-lg">Prime locations, elegant flow & reliable operations.</p>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">6</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Digital & Delivery</h3>
+          <p class="text-amber-700 text-lg">Seamless online integration & multi-channel revenue.</p>
+        </div>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">7</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Legal Excellence</h3>
+          <p class="text-amber-700 text-lg">Navigate licenses, compliance & Indian regulations smoothly.</p>
+        </div>
+      </div>
+
+      <!-- Step 8 (Highlighted final step) -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group border-2 border-amber-500/50">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-500 to-red-600 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300">
+            <span class="text-5xl font-bold text-cream drop-shadow-lg">8</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-900 mb-3">Investor-Ready Pitch</h3>
+          <p class="text-amber-800 text-lg font-medium">Present your polished café vision with confidence.</p>
+        </div>
+      </div>
+
+      <!-- Duplicate first few items for seamless infinite loop -->
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">1</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Concept & Vision</h3>
+          <p class="text-amber-700 text-lg">Ignite your unique café idea and entrepreneurial mindset.</p>
+        </div>
+      </div>
+
+      <div class="carousel-item min-w-[320px] md:min-w-[380px] px-4">
+        <div class="content-card p-10 text-center hover:shadow-2xl transition-all duration-500 group">
+          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-400 border-4 border-amber-300/60">
+            <span class="text-5xl font-bold text-cream drop-shadow-md">2</span>
+          </div>
+          <h3 class="text-2xl font-semibold text-amber-800 mb-3">Financial Mastery</h3>
+          <p class="text-amber-700 text-lg">Master costs, revenue modeling & break-even precision.</p>
+        </div>
+      </div>
+
+      <!-- Add 1-2 more duplicates if needed for smoother loop -->
+    </div>
+
+    <!-- Optional navigation arrows (styled premium) -->
+    <button id="prevBtn" class="absolute left-4 top-1/2 -translate-y-1/2 bg-amber-800/70 text-cream p-4 rounded-full hover:bg-amber-700 transition z-20 shadow-lg backdrop-blur-sm">
+      ←
+    </button>
+    <button id="nextBtn" class="absolute right-4 top-1/2 -translate-y-1/2 bg-amber-800/70 text-cream p-4 rounded-full hover:bg-amber-700 transition z-20 shadow-lg backdrop-blur-sm">
+      →
+    </button>
+  </div>
+</section>
+    <!-- Info Icons -->
+ <section class="reveal grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto px-6 py-20">
+  <!-- Entrepreneurship Card -->
+  <div class="clay-card group">
+    <div class="image-wrapper">
+      <img 
+        src="./images/rrrrr.jpg" 
+        alt="Entrepreneurship" 
+        class="card-image"
+        loading="lazy"
+      >
+    </div>
+    <div class="content">
+      <h3 class="card-title">Entrepreneurship</h3>
+      <p class="card-desc">From vision to validated startup</p>
+    </div>
+  </div>
+
+  <!-- Finance Mastery Card -->
+  <div class="clay-card group">
+    <div class="image-wrapper">
+      <img 
+        src="./images/Wealth of Geeks - Wealth of Geeks.jpg" 
+        alt="Finance Mastery" 
+        class="card-image"
+        loading="lazy"
+      >
+    </div>
+    <div class="content">
+      <h3 class="card-title">Finance Mastery</h3>
+      <p class="card-desc">Costs • Revenue • True Profit</p>
+    </div>
+  </div>
+
+  <!-- Elite Operations Card -->
+  <div class="clay-card group">
+    <div class="image-wrapper">
+      <img 
+        src="./images/Explore OKR Examples for Goal-Driven Success_.jpg" 
+        alt="Elite Operations" 
+        class="card-image"
+        loading="lazy"
+      >
+    </div>
+    <div class="content">
+      <h3 class="card-title">Elite Operations</h3>
+      <p class="card-desc">Location • Delivery • Flow</p>
+    </div>
+  </div>
+
+  <!-- Premium Marketing Card -->
+  <div class="clay-card group">
+    <div class="image-wrapper">
+      <img 
+        src="./images/🤑.jpg" 
+        alt="Premium Marketing" 
+        class="card-image"
+        loading="lazy"
+      >
+    </div>
+    <div class="content">
+      <h3 class="card-title">Premium Marketing</h3>
+      <p class="card-desc">Brand • Loyalty • Growth</p>
+    </div>
+  </div>
+</section>
+    <!-- Modules -->
+    <section class="reveal grid md:grid-cols-3 gap-10">
+      <div class="content-card p-10">
+        <h2 class="text-3xl font-semibold mb-6 text-amber-800">Module 1</h2>
+        <p class="text-xl text-amber-700 mb-6 font-medium">The Business Foundations</p>
+        <ul class="space-y-4 text-lg">
+          <li>• Startup & entrepreneurial mindset</li>
+          <li>• Fixed vs variable costs mastery</li>
+          <li>• Break-even & profitability modeling</li>
+        </ul>
+      </div>
+
+      <div class="content-card p-10">
+        <h2 class="text-3xl font-semibold mb-6 text-amber-800">Module 2</h2>
+        <p class="text-xl text-amber-700 mb-6 font-medium">Menu Engineering & Marketing</p>
+        <ul class="space-y-4 text-lg">
+          <li>• Precision pricing & COGS</li>
+          <li>• Deep customer profiling</li>
+          <li>• Brand identity & digital promotion</li>
+        </ul>
+      </div>
+
+      <div class="content-card p-10">
+        <h2 class="text-3xl font-semibold mb-6 text-amber-800">Module 3</h2>
+        <p class="text-xl text-amber-700 mb-6 font-medium">Indian Café Excellence</p>
+        <ul class="space-y-4 text-lg">
+          <li>• 2025–2030 market intelligence</li>
+          <li>• Competitive landscape strategy</li>
+          <li>• Prime location & scalable operations</li>
+        </ul>
+      </div>
+
+      <div class="content-card p-10">
+        <h2 class="text-3xl font-semibold mb-6 text-amber-800">Module 4</h2>
+        <p class="text-xl text-amber-700 mb-6 font-medium">Signature Experience & Pitch</p>
+        <ul class="space-y-4 text-lg">
+          <li>• Luxury-level customer service</li>
+          <li>• Spatial design & guest flow</li>
+          <li>• Confident investor-grade pitching</li>
+        </ul>
+      </div>
+
+      <div class="content-card p-10">
+        <h2 class="text-3xl font-semibold mb-6 text-amber-800">Capstone Project</h2>
+        <p class="text-xl text-amber-700 mb-6 font-medium">My Premium Digital Café Plan</p>
+        <ul class="space-y-4 text-lg">
+          <li>• Signature menu curation</li>
+          <li>• Detailed cost-profit projections</li>
+          <li>• High-end marketing visuals & poster</li>
+        </ul>
+      </div>
+
+      <div class="content-card p-10">
+        <h2 class="text-3xl font-semibold mb-6 text-amber-800">Elite Certificate</h2>
+        <p class="text-xl text-amber-700 mb-6 font-medium">Excellence Requirements</p>
+        <ul class="space-y-4 text-lg">
+          <li>• Full module completion</li>
+          <li>• Approved capstone submission</li>
+          <li>• Mastery demonstrated in all assessments</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Brand Value -->
+    <section class="reveal">
+      <div class="content-card p-16 grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="text-5xl font-light mb-8 text-amber-900">Exclusive Benefits for <span class="text-amber-700 font-medium">Your Brand</span></h2>
+          <p class="text-xl mb-8 opacity-90">Position your brand at the forefront of youth entrepreneurship, talent development, and premium café culture in one of India's fastest-growing sectors.</p>
+          <ul class="space-y-5 text-lg">
+            <li>✔ Signature brand-integrated education</li>
+            <li>✔ Deep youth market engagement & loyalty</li>
+            <li>✔ Elevated global visibility in education</li>
+            <li>✔ High-potential talent & workforce pipeline</li>
+            <li>✔ Authentic CSR & social prestige</li>
+            <li>✔ Scalable, turnkey regional rollout</li>
+            <li>✔ Enduring brand affinity & advocacy</li>
+          </ul>
+        </div>
+        <div class="content-card p-12 bg-gradient-to-br from-amber-50 to-cream">
+          <h2 class="text-4xl font-light mb-8 text-amber-900">What Elite Participants Gain</h2>
+          <ul class="space-y-5 text-lg">
+            <li>• Sophisticated real-world business acumen</li>
+            <li>• Advanced financial modeling & insight</li>
+            <li>• Premium brand strategy & psychology</li>
+            <li>• High-efficiency café operations expertise</li>
+            <li>• Cutting-edge digital growth tactics</li>
+            <li>• True entrepreneurial leadership mindset</li>
+            <li>• Industry-ready, investor-attractive thinking</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="py-16 text-center text-lg">
+  <div class="max-w-6xl mx-auto px-6">
+    © <span id="year">2026</span> Running a Cafe – The Business of Beans  
+    <span class="mx-4">•</span> Crafted for Excellence • Brewed for Legacy
+  </div>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add("visible");
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+  // Infinite Carousel Logic
+const track = document.getElementById('carouselTrack');
+const items = document.querySelectorAll('.carousel-item');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+let currentIndex = 0;
+const itemWidth = items[0].offsetWidth + 32; // including padding
+const totalItems = items.length / 2; // since duplicated
+
+function moveTo(index) {
+  track.style.transform = `translateX(-${index * itemWidth}px)`;
+}
+
+nextBtn.addEventListener('click', () => {
+  currentIndex = (currentIndex + 1) % totalItems;
+  moveTo(currentIndex);
+});
+
+prevBtn.addEventListener('click', () => {
+  currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+  moveTo(currentIndex);
+});
+
+// Auto-scroll (smooth continuous motion)
+let autoScroll = setInterval(() => {
+  currentIndex = (currentIndex + 1) % totalItems;
+  moveTo(currentIndex);
+}, 4500); // every 4.5 seconds
+
+// Pause on hover
+track.addEventListener('mouseenter', () => clearInterval(autoScroll));
+track.addEventListener('mouseleave', () => {
+  autoScroll = setInterval(() => {
+    currentIndex = (currentIndex + 1) % totalItems;
+    moveTo(currentIndex);
+  }, 4500);
+});
+
+// Initial position
+moveTo(0);
+</script>
+
+</body>
+</html>
